@@ -145,26 +145,3 @@ void TileMap::DrawLayer(ILayer* iLayer)
 	}
 }
 
-
-//unsigned int TileMap::LayerCount()
-//{
-//	return namedLayers.size();
-//}
-//Layer* TileMap::GetLayerById(unsigned int id)
-//{
-//	for (auto& iter : namedLayers)
-//	{
-//		if (iter.second.id == id)
-//			return &(iter.second);
-//	}
-//
-//	return nullptr;
-//}
-//Layer* TileMap::GetLayerByName(const std::string& name)
-//{
-//	auto iter = namedLayers.find(name);
-//	if (iter == namedLayers.end())
-//		return nullptr;
-//
-//	return &(iter->second);
-//}

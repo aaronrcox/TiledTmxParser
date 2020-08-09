@@ -51,3 +51,4 @@ void TileMapRenderer::DrawRectLines(int dstX, int dstY, int dstW, int dstH, int 
 {
 	::DrawRectangleLinesEx({ (float)dstX, (float)dstY, (float)dstW, (float)dstH }, thickness, *((Color*)(&color)));
 }
+

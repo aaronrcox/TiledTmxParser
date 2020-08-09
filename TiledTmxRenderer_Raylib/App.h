@@ -5,6 +5,7 @@
 #include "raylib.h"
 
 class TileMap;
+class Player;
 
 class App
 {
@@ -21,6 +22,8 @@ public:
 	void Update(float dt);
 	void Draw();
 
+	void DrawPlayer();
+
 	void SmoothCameraFollow(Vector2 targetPos, float dt);
 
 protected:
@@ -34,7 +37,7 @@ protected:
 	Camera2D m_camera = { 0 };
 	Rectangle view = { 0, 0, 1440, 900 };
 
-	Vector2 m_playerPos = { 0, 0 };
+	Player* m_player = nullptr;
 
 private:
 };
