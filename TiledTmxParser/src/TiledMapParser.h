@@ -23,9 +23,10 @@ protected:
 	bool TryParseGroupElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParseEditorSettingsElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParsePropertiesElement(tinyxml2::XMLElement* elem, PropertyCollection& properties);
-	bool TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, LayerData& data);
-
+	bool TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, TileLayerData& data);
 	bool TryParseImageElement(tinyxml2::XMLElement* elem, TileMap* map, TileSet& tileset);
+
+	void PopulateLayerTileData(TileMap* map, TileLayer* layer);
 
 	TileMap::Orientation OrientationFromString(const char *sOrientation);
 	TileMap::RenderOrder RenderOrderFromString(const char* sRenderOrder);

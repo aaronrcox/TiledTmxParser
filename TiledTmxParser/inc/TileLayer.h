@@ -3,10 +3,14 @@
 #include <string>
 #include <vector>
 #include "PropertyCollection.h"
+#include "TileState.h"
 
-typedef std::vector<uint32_t> LayerData;
+typedef std::vector<uint32_t> TileLayerData;
+typedef std::vector<TileState> TileStateLookup;
 
-
+class TileMap;
+class TileSet;
+class TileState;
 
 class ILayer
 {
@@ -18,7 +22,11 @@ public:
 		OBJECT_GROUP // currently un-supported
 	};
 
+	// identifyies which type of layer this instance is.
 	LayerType type;
+
+	// pointer back to the map
+	TileMap* map = nullptr;
 
 public:
 
@@ -30,21 +38,10 @@ class TileLayer : public ILayer
 {
 public:
 
-	struct TileState
-	{
-		unsigned int globalTileId;
-		bool flipped_vertical;
-		bool flipped_horizontal;
-		bool flipped_diagonally;
-	};
-
-
-public:
-
 	TileLayer() : ILayer(ILayer::LayerType::LAYER) { }
 	virtual ~TileLayer() { }
 
-	TileState GetTileData(unsigned int x, unsigned int y);
+	TileState& GetTileData(unsigned int x, unsigned int y);
 
 public:
 
@@ -63,5 +60,10 @@ public:
 	int offsetY = 0;
 
 	PropertyCollection properties = PropertyCollection();
-	LayerData data = LayerData();
+
+	// tile data calculated after rawTileData has been generated
+	TileStateLookup tileData = TileStateLookup();
+
+	// Raw tile data as stored in tmx file
+	TileLayerData rawTileData = TileLayerData();
 };

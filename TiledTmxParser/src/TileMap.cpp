@@ -1,6 +1,8 @@
 #include "TileMap.h"
+#include "ITileMapRenderer.h"
 #include "TiledMapParser.h"
 #include "TileLayer.h"
+#include <algorithm>
 
 TileMap::TileMap()
 {
@@ -26,6 +28,26 @@ void TileMap::LoadTextures(std::function<void(std::string)> loadTextureCallback)
 	}
 }
 
+void TileMap::SetRenderer(ITileMapRenderer* renderer)
+{
+	if (m_renderer != nullptr)
+		delete m_renderer;
+
+	m_renderer = renderer;
+	if (m_renderer == nullptr)
+		return;
+
+	for (auto iter : tileSets)
+	{
+		m_renderer->LoadTexture(iter.second.imageFileName);
+	}
+}
+
+ITileMapRenderer* TileMap::GetRenderer()
+{
+	return m_renderer;
+}
+
 TileSet *TileMap::GetTileSetFromGID(unsigned int gTilesetId)
 {
 	for (auto& iter : tileSets)
@@ -40,7 +62,7 @@ TileSet *TileMap::GetTileSetFromGID(unsigned int gTilesetId)
 	return nullptr;
 }
 
-void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
+void TileMap::DrawLayer(ILayer* iLayer)
 {
 	union sColor
 	{
@@ -62,6 +84,19 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 	case TileMap::RenderOrder::LEFT_DOWN:   sx = cols - 1; sy = 0;        xd = -1; yd = 1;  break;
 	}
 
+
+	int minX = (m_renderer->viewX / (int)tileWidth);
+	int maxX = minX + (m_renderer->viewW / (int)tileWidth) + 1;
+	int minY = (m_renderer->viewY / (int)tileHeight);
+	int maxY = minY + (m_renderer->viewH / (int)tileHeight) + 1;
+
+	sx = std::max(minX, std::min(sx, maxX));
+	sy = std::max(minY, std::min(sy, maxY));
+	maxX = std::max(0, std::min(maxX, (int)cols));
+	maxY = std::max(0, std::min(maxY, (int)rows));
+
+	
+
 	if (iLayer->type == ILayer::LayerType::LAYER)
 	{
 		auto layer = dynamic_cast<TileLayer*>(iLayer);
@@ -72,26 +107,15 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 			return;
 
 		// loop through each tile for the layer
-		for (int y = sy; y >= 0 && y < rows; y += yd)
+		for (int y = sy; y >= 0 && y < maxY; y += yd)
 		{
-			for (int x = sx; x >= 0 && x < cols; x += xd)
+			for (int x = sx; x >= 0 && x < maxX; x += xd)
 			{
-				// get the index for the current tile in the layer
-				unsigned int layerDataIndex = y * cols + x;
-
 				// get the Global tileSetTileId from the layer data
-				auto tileData = layer->GetTileData(x, y);
+				auto& tileData = layer->GetTileData(x, y);
 
 				if (tileData.globalTileId == 0)
 					continue;
-
-				// find the approprate tileSet to use based on the tilesetId.
-				// and convert it to the local tileset index.
-				auto tileset = GetTileSetFromGID(tileData.globalTileId);
-				auto tilesetId = tileset->GlobalToLocalTileId(tileData.globalTileId);
-
-				int srcXIndex = tilesetId % tileset->tilesPerRow;
-				int srcYIndex = tilesetId / tileset->tilesPerRow;
 
 				// calculate the color for the rendered tile: layerTintColor + apply opacity to alpha
 				sColor col;
@@ -99,14 +123,14 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 				col.a = layer->opacity * col.a;
 
 				// Finally, we have enough information to draw the tile
-				drawTileCb(
+				m_renderer->DrawTile(
 
-					tileset->imageFileName,
+					tileData.tileset->imageFileName,
 
-					srcXIndex * tileset->tileWidth,
-					srcYIndex * tileset->tileHeight,
-					tileset->tileWidth,
-					tileset->tileHeight,
+					tileData.xIndex * tileData.tileset->tileWidth,
+					tileData.yIndex * tileData.tileset->tileHeight,
+					tileData.tileset->tileWidth,
+					tileData.tileset->tileHeight,
 
 					x * tileWidth,
 					y * tileHeight,
@@ -119,6 +143,9 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 			}
 		}
 	}
+
+	m_renderer->DrawRectLines(sx* tileWidth, sy* tileHeight, (maxX-sx)*tileWidth, (maxY-sy)*tileHeight, 2, 0xFF000000);
+	m_renderer->DrawRectLines(m_renderer->viewX, m_renderer->viewY, m_renderer->viewW, m_renderer->viewH, 2, 0x7f0000FF);
 	
 }
 

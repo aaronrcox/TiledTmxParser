@@ -8,6 +8,8 @@
 #include "TileSetCollection.h"
 #include "NamedTileLayerCollection.h"
 
+class ITileMapRenderer;
+
 class TileMap
 {
 public:
@@ -26,12 +28,6 @@ public:
 		UNKNOWN
 	};
 
-	typedef std::function<void(
-		const std::string textureFilename,
-		int srcX, int srcY, int srcW, int srcH,
-		int dstX, int dstY, int dstW, int dstH,
-		unsigned int color
-		)> DrawTileCb;
 
 public:
 
@@ -41,7 +37,10 @@ public:
 	void Load(const char* filename);
 	void LoadTextures(std::function<void(std::string)> loadTextureCallback);
 
-	void DrawLayer(ILayer *layer, DrawTileCb draw);
+	void SetRenderer(ITileMapRenderer* renderer);
+	ITileMapRenderer* GetRenderer();
+
+	void DrawLayer(ILayer *layer);
 
 	TileSet *GetTileSetFromGID(unsigned int gTilesetId);
 
@@ -62,4 +61,7 @@ public:
 	PropertyCollection properties;
 
 	std::vector<ILayer*> layers;
+
+private:
+	ITileMapRenderer* m_renderer = nullptr;
 };

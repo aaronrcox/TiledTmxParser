@@ -51,6 +51,12 @@
     <ClInclude Include="inc\NamedTileLayerCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\TileState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ITileMapRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\TinyXml2\TinyXml2.cpp">

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include "PropertyCollection.h"
+
+typedef std::map<unsigned int, PropertyCollection> TilePropertyCollection;
 
 class TileSet
 {
@@ -32,4 +36,8 @@ public:
 	unsigned int imageHeight;
 
 	unsigned int colorKey;
+
+	// access to a property for a given tile
+	// properties[localTileId]["propertyName"]
+	TilePropertyCollection properties;
 };

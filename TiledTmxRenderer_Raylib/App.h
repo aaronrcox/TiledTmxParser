@@ -29,5 +29,10 @@ protected:
 	TileMap* m_map = nullptr;
 	std::map<std::string, Texture2D> m_textureLookup; // filename to texture
 
+	Camera2D m_camera = { 0 };
+	Rectangle view = { 0, 0, 1440, 900 };
+
+	Vector2 m_playerPos = { 0, 0 };
+
 private:
 };

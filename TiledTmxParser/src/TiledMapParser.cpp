@@ -81,6 +81,14 @@ bool TiledMapParser::LoadFromFile(const std::string& filename, TileMap* map)
 		childMapElem = childMapElem->NextSiblingElement();
 	}
 
+	// We have finished loading...
+	// populate cached tile data for each layer so that we dont have to do it at runtime.
+	for (auto layer : map->layers)
+	{
+		if (layer->type == ILayer::LayerType::LAYER) {
+			PopulateLayerTileData(map, (TileLayer*)layer);
+		}
+	}
 	return true;
 }
 
@@ -105,6 +113,7 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 		return false;
 	}
 
+	// Read <tileset> attributes
 	tileset[name].name = name;
 	tileset[name].firstGlobalTileId = elem->IntAttribute("firstgid");
 	tileset[name].tileWidth = elem->IntAttribute("tilewidth");
@@ -127,7 +136,7 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 		return false;
 	};
 	parseFnLookup["tile"] = [&](auto elem) {
-		// TODO: support tile
+		// TODO: support tile & tile properties
 		return false;
 	};
 	
@@ -164,6 +173,7 @@ bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* m
 
 	// load layer attributes
 	layers[name].name = name;
+	layers[name].map = map;
 	layers[name].id = elem->IntAttribute("id");
 	layers[name].rows = elem->IntAttribute("height");
 	layers[name].cols = elem->IntAttribute("width");
@@ -175,7 +185,7 @@ bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* m
 	
 	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
 	parseFnLookup["data"] = [&](auto elem) {
-		return TryParseDataElement(elem, layers[name], layers[name].data);
+		return TryParseDataElement(elem, layers[name], layers[name].rawTileData);
 	};
 	parseFnLookup["properties"] = [&](auto elem) {
 		return TryParsePropertiesElement(elem, layers[name].properties);
@@ -293,7 +303,7 @@ bool TiledMapParser::TryParseImageElement(tinyxml2::XMLElement* elem, TileMap *m
 }
 
 
-bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, LayerData& data)
+bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, TileLayerData& data)
 {
 	// Refer to documentation for <image> element
 	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data
@@ -314,14 +324,17 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 
 	if (strcmp("csv", encoding) == 0)
 	{
-		// TODO: support reading csv data.
+		throw std::exception("Parsing CSV format in TSX not yet supported, please update to use Base64 - ZLib export");
 	}
 	else if (strcmp("base64", encoding) == 0 && compression == nullptr)
 	{
 		// uncompressed - copy sBytes to layerdata
+		throw std::exception("Parsing base64(uncompressed) format in TSX not yet supported, please update to use Base64 - ZLib export");
+		/*
 		data.assign(
 			(unsigned int*)&sBytes.data()[0],
 			(unsigned int*)&sBytes.data()[sBytes.size() - 1]);
+		*/
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("zlib", compression) == 0)
 	{
@@ -340,12 +353,14 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 		// TODO: support gzip
 		//  - find a gzip compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
+		throw std::exception("Parsing Base64(GZip) format in TSX not yet supported, please update to use Base64 - ZLib export");
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("zstd", compression) == 0)
 	{
 		// TODO: support zstd
-		//  - find a gzip compression lib, use it to decompress data
+		//  - find a zstd compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
+		throw std::exception("Parsing Base64(zstd) format in TSX not yet supported, please update to use Base64 - ZLib export");
 	}
 
 	return true;
@@ -388,7 +403,6 @@ TileMap::RenderOrder TiledMapParser::RenderOrderFromString(const char* sRenderOr
 
 	// unknown
 	return TileMap::RenderOrder::UNKNOWN;
-
 }
 
 Property::Type TiledMapParser::PropertyTypeFromString(const char* sPropertyType)
@@ -442,11 +456,67 @@ std::string TiledMapParser::TrimString(const std::string& s)
 	// https://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
 
 	const int l = (int)s.length();
-	size_t a = 0, b = l - 1;
+	size_t a = 0, b = l-1;
 	char c;
 	while (a < l && ((c = s.at(a)) == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0')) a++;
 	while (b > a && ((c = s.at(b)) == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0')) b--;
 
 	return s.substr(a, 1 + b - a);
+}
+
+
+void TiledMapParser::PopulateLayerTileData(TileMap *map, TileLayer* layer)
+{
+	// data in a tile also includes flags for if it should be flipped
+	// we need to read the bits that indicate flipped, and then clear them out
+	// to acquire the globalTileId
+	// Refer to documentation on Tile Flippling
+	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#tile-flipping
+
+	static const unsigned FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+	static const unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
+	static const unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+
+	layer->tileData.clear();
+
+	// reserve to prevent resizing
+	unsigned int numTiles = layer->rows * layer->cols;
+	layer->tileData.reserve(numTiles + 1);
+
+	for (int y = 0; y < layer->rows; y++)
+	{
+		for (int x = 0; x < layer->cols; x++)
+		{
+			int index = y * layer->cols + x;
+			unsigned globalTileId = layer->rawTileData[index];
+
+			// get filpped status from the globalTileId
+			bool flipped_horizontally = (globalTileId & FLIPPED_HORIZONTALLY_FLAG);
+			bool flipped_vertically = (globalTileId & FLIPPED_VERTICALLY_FLAG);
+			bool flipped_diagonally = (globalTileId & FLIPPED_DIAGONALLY_FLAG);
+
+			// clear out the flags
+			globalTileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+
+			// configure the tileState information
+			TileState tileData;
+			tileData.globalTileId = globalTileId;
+			tileData.layer = layer;
+
+			if (globalTileId > 0)
+			{
+				tileData.tileset = map->GetTileSetFromGID(globalTileId);
+				tileData.localTileId = tileData.tileset->GlobalToLocalTileId(globalTileId);
+				tileData.properties = &tileData.tileset->properties[tileData.localTileId];
+				tileData.flipped_horizontal = flipped_horizontally || flipped_diagonally;
+				tileData.flipped_vertical = flipped_vertically || flipped_diagonally;
+				tileData.xIndex = tileData.localTileId % tileData.tileset->tilesPerRow;
+				tileData.yIndex = tileData.localTileId / tileData.tileset->tilesPerRow;
+			}			
+			// save the tileData on the layer..
+			layer->tileData.push_back(tileData);
+		}
+
+	}
 }
 

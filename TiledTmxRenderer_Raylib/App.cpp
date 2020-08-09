@@ -1,8 +1,7 @@
 #include "App.h"
 
-#define _INCLUDE_TiledTmxParserLib_
 #include "TileMap.h"
-
+#include "TileMapRenderer.h"
 
 
 App::App()
@@ -42,49 +41,55 @@ void App::Run()
 void App::Load()
 {
 	m_map = new TileMap();
-	m_map->Load("./assets/orthogonal-outside.tmx");
+	m_map->Load("./assets/test.tmx");
+	m_map->SetRenderer(new TileMapRenderer());
 
-	m_map->LoadTextures([this](std::string filename) {
-		m_textureLookup[filename] = LoadTexture(filename.c_str());
-	});
+	// setup camera
+	m_camera.target = { m_playerPos.x + 20.0f, m_playerPos.y + 20.0f };
+	m_camera.offset = { m_windowWidth / 2.0f, m_windowHeight / 2.0f };
+	m_camera.rotation = 0.0f;
+	m_camera.zoom = 1.0f;
 
 }
 void App::Unload()
 {
+	m_map->SetRenderer(nullptr);
 	delete m_map;
 }
 
 void App::Update(float dt)
 {
+	if(IsKeyDown(KEY_UP)) m_camera.zoom += 1.0f * dt;
+	if (IsKeyDown(KEY_DOWN)) m_camera.zoom -= 1.0f * dt;
 
+	if (IsKeyDown(KEY_A)) m_playerPos.x -= 100 * dt;
+	if (IsKeyDown(KEY_D)) m_playerPos.x += 100 * dt;
+	if (IsKeyDown(KEY_W)) m_playerPos.y -= 100 * dt;
+	if (IsKeyDown(KEY_S)) m_playerPos.y += 100 * dt;
+
+	// update camera
+	m_camera.target = { m_playerPos.x + 20.0f, m_playerPos.y + 20.0f };
+	view.x = m_camera.target.x - m_camera.offset.x;
+	view.y = m_camera.target.y - m_camera.offset.y;
 }
 
 void App::Draw()
 {
+	BeginMode2D(m_camera);
+	// Setting view port enables renderer
+	// to only draw tiles that are visible.
+	m_map->GetRenderer()->SetView(view.x, view.y, view.width, view.height);
 
-	auto DrawTile = [this](const std::string& texture, int srcX, int srcY, int srcW, int srcH, 
-		int dstX, int dstY, int dstW, int dstH, unsigned int color)
-	{
-		Rectangle src = { srcX, srcY, srcW, srcH };
-		Rectangle dst = { dstX, dstY, dstW, dstH };
-
-		// convert unsigned int to Raylib color struct
-		Color tintColor = *((Color*)(&color));
-
-		// get thexture from our lookup table
-		auto& tex = m_textureLookup[texture];
-
-		// draw the tile via raylib
-		DrawTexturePro(tex, src, dst, { 0, 0 }, 0.0f, tintColor);
-	};
-
-	
+	// loop through each layer - invoke draw method
 	for (auto& layer : m_map->layers)
 	{
-		m_map->DrawLayer(layer, DrawTile);
+		m_map->DrawLayer(layer);
 	}
 
+	EndMode2D();
 
+	// Draw Game FPS
+	DrawRectangle(0, 0, m_windowWidth, 42, { 0, 0, 0, 128 });
+	DrawFPS(10, 10);
 }
-
 
