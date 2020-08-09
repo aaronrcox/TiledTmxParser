@@ -21,11 +21,10 @@ public:
 	void Update(float dt);
 	void Draw();
 
-	
 protected:
 
-	int m_windowWidth = 800;
-	int m_windowHeight = 450;
+	int m_windowWidth = 1440;
+	int m_windowHeight = 900;
 
 	TileMap* m_map = nullptr;
 	std::map<std::string, Texture2D> m_textureLookup; // filename to texture

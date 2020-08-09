@@ -112,6 +112,9 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileSetC
 	tileset[name].margin = elem->IntAttribute("margin");
 	tileset[name].tileCount = elem->IntAttribute("tilecount");
 	tileset[name].tilesPerRow = elem->IntAttribute("columns");
+	tileset[name].tileOffsetX = 0;
+	tileset[name].tileOffsetY = 0;
+
 	// TODO: SUPPORT tileset objectAlignment attribute; tileset[name].objectAlignment = elem->Attribute("objectalignment");
 
 	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
@@ -145,7 +148,7 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileSetC
 
 	return true;
 }
-bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, LayerCollection& layers)
+bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layers)
 {
 	// Refer to documentation for tmx file <layer> element
 	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#layer
@@ -165,7 +168,7 @@ bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* m
 	layers[name].cols = elem->IntAttribute("width");
 	layers[name].opacity = elem->FloatAttribute("opacity", 1.0f);
 	layers[name].visible = elem->BoolAttribute("visible", true);
-	layers[name].tintColor = ColorFromString(elem->Attribute("tintcolor", "0xFFFFFFFF"));
+	layers[name].tintColor = ColorFromString(elem->Attribute("tintcolor"));
 	layers[name].offsetX = elem->IntAttribute("offsetx");
 	layers[name].offsetY = elem->IntAttribute("offsety");
 	
@@ -410,6 +413,7 @@ Property::Type TiledMapParser::PropertyTypeFromString(const char* sPropertyType)
 
 unsigned int TiledMapParser::ColorFromString(const char* sColor)
 {
+
 	if (sColor == nullptr)
 		return 0xFFFFFFFF;
 
@@ -417,6 +421,10 @@ unsigned int TiledMapParser::ColorFromString(const char* sColor)
 	if (color[0] == '#')
 	{
 		color = "0x" + color.substr(1);
+	}
+	if (color.size() == 8)
+	{
+		color += "ff"; // add ff for alpha
 	}
 
 	unsigned int value;
@@ -428,12 +436,12 @@ unsigned int TiledMapParser::ColorFromString(const char* sColor)
 
 std::string TiledMapParser::TrimString(const std::string& s)
 { 
-	// removes whitespace characters from beginnig and end of string s
+	// removes whitespace characters from beginnig and end of string
 	// solution was one of the answers on stack overflow... seemed to be mmost efficent though was not the "approved"
 	// https://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
 
 	const int l = (int)s.length();
-	int a = 0, b = l - 1;
+	size_t a = 0, b = l - 1;
 	char c;
 	while (a < l && ((c = s.at(a)) == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0')) a++;
 	while (b > a && ((c = s.at(b)) == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0')) b--;

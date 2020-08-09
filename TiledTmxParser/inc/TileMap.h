@@ -6,8 +6,7 @@
 
 #include "PropertyCollection.h"
 #include "TileSetCollection.h"
-#include "LayerCollection.h"
-
+#include "NamedTileLayerCollection.h"
 
 class TileMap
 {
@@ -58,7 +57,7 @@ public:
 	unsigned int tileHeight;
 
 	TileSetCollection tileSets;
-	LayerCollection namedLayers;
+	NamedTileLayerCollection namedLayers;
 	PropertyCollection properties;
 
 	std::vector<ILayer*> layers;

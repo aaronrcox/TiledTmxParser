@@ -5,4 +5,4 @@
 
 #include "TileLayer.h"
 
-typedef std::map<std::string, TileLayer> LayerCollection;
+typedef std::map<std::string, TileLayer> NamedTileLayerCollection;

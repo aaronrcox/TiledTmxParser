@@ -1,5 +1,9 @@
 #include "App.h"
+
+#define _INCLUDE_TiledTmxParserLib_
 #include "TileMap.h"
+
+
 
 App::App()
 {
@@ -39,10 +43,12 @@ void App::Load()
 {
 	m_map = new TileMap();
 	m_map->Load("./assets/orthogonal-outside.tmx");
+
 	m_map->LoadTextures([this](std::string filename) {
 		auto file = "./assets/" + filename;
 		m_textureLookup[filename] = LoadTexture(file.c_str());
 	});
+
 }
 void App::Unload()
 {
@@ -69,7 +75,7 @@ void App::Draw()
 		// get thexture from our lookup table
 		auto& tex = m_textureLookup[texture];
 
-		// draw the tile
+		// draw the tile via raylib
 		DrawTexturePro(tex, src, dst, { 0, 0 }, 0.0f, tintColor);
 	};
 
@@ -78,6 +84,7 @@ void App::Draw()
 	{
 		m_map->DrawLayer(layer, DrawTile);
 	}
+
 
 }
 

@@ -42,6 +42,11 @@ TileSet *TileMap::GetTileSetFromGID(unsigned int gTilesetId)
 
 void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 {
+	union sColor
+	{
+		struct { unsigned char r, g, b, a; };
+		unsigned int value;
+	};
 	
 	int sx = 0, sy = 0;
 	int xd = 1, yd = 1;
@@ -59,7 +64,6 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 
 	if (iLayer->type == ILayer::LayerType::LAYER)
 	{
-
 		auto layer = dynamic_cast<TileLayer*>(iLayer);
 		if (layer == nullptr)
 			return;
@@ -89,6 +93,11 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 				int srcXIndex = tilesetId % tileset->tilesPerRow;
 				int srcYIndex = tilesetId / tileset->tilesPerRow;
 
+				// calculate the color for the rendered tile: layerTintColor + apply opacity to alpha
+				sColor col;
+				col.value = layer->tintColor;
+				col.a = layer->opacity * col.a;
+
 				// Finally, we have enough information to draw the tile
 				drawTileCb(
 
@@ -104,7 +113,7 @@ void TileMap::DrawLayer(ILayer* iLayer, DrawTileCb drawTileCb)
 					tileWidth,
 					tileHeight,
 
-					layer->tintColor
+					col.value
 				);
 
 			}
