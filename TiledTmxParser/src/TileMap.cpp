@@ -22,7 +22,7 @@ void TileMap::LoadTextures(std::function<void(std::string)> loadTextureCallback)
 {
 	for (auto iter : tileSets)
 	{
-		loadTextureCallback(iter.second.imageFileName.c_str());
+		loadTextureCallback(iter.second.imageFileName);
 	}
 }
 

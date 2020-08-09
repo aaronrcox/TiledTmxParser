@@ -12,11 +12,11 @@ public:
 	TiledMapParser();
 	~TiledMapParser();
 
-	bool LoadFromFile(const char *filename, TileMap *map);
+	bool LoadFromFile(const std::string& filename, TileMap *map);
 
 protected:
 
-	bool TryParseTileSetElement(tinyxml2::XMLElement* elem, TileSetCollection& tilesets);
+	bool TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap* map, TileSetCollection& tilesets);
 	bool TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layer);
 	bool TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParseImageLayerElement(tinyxml2::XMLElement* elem, TileMap* map);
@@ -25,7 +25,7 @@ protected:
 	bool TryParsePropertiesElement(tinyxml2::XMLElement* elem, PropertyCollection& properties);
 	bool TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, LayerData& data);
 
-	bool TryParseImageElement(tinyxml2::XMLElement* elem, TileSet& tileset);
+	bool TryParseImageElement(tinyxml2::XMLElement* elem, TileMap* map, TileSet& tileset);
 
 	TileMap::Orientation OrientationFromString(const char *sOrientation);
 	TileMap::RenderOrder RenderOrderFromString(const char* sRenderOrder);

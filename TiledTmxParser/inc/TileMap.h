@@ -48,6 +48,7 @@ public:
 public:
 
 	std::string version;
+	std::string baseFilePath;
 	Orientation orientation;
 	RenderOrder renderOrder;
 

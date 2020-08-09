@@ -45,8 +45,7 @@ void App::Load()
 	m_map->Load("./assets/orthogonal-outside.tmx");
 
 	m_map->LoadTextures([this](std::string filename) {
-		auto file = "./assets/" + filename;
-		m_textureLookup[filename] = LoadTexture(file.c_str());
+		m_textureLookup[filename] = LoadTexture(filename.c_str());
 	});
 
 }

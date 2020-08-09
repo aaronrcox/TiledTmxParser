@@ -19,14 +19,15 @@ TiledMapParser::~TiledMapParser()
 
 }
 
-bool TiledMapParser::LoadFromFile(const char* filename, TileMap* map)
+bool TiledMapParser::LoadFromFile(const std::string& filename, TileMap* map)
 {
 	XMLDocument doc;
-	doc.LoadFile(filename);
+	doc.LoadFile(filename.c_str());
 
 	auto mapElem = doc.RootElement();
 
 	// Parse <Map> element attributes
+	map->baseFilePath = filename.substr(0, filename.find_last_of("\\/")) + "/";
 	map->version = mapElem->Attribute("version");
 	map->orientation = OrientationFromString(mapElem->Attribute("orientation"));
 	map->renderOrder = RenderOrderFromString(mapElem->Attribute("renderorder"));
@@ -39,7 +40,7 @@ bool TiledMapParser::LoadFromFile(const char* filename, TileMap* map)
 	// Create a lookup table of methods to call for each child of <Map>
 	std::map<std::string, std::function<bool(XMLElement *elem)>> parseFnLookup;
 	parseFnLookup["tileset"] = [&](auto elem) { 
-		return TryParseTileSetElement(elem, map->tileSets);
+		return TryParseTileSetElement(elem, map, map->tileSets);
 	};
 	parseFnLookup["layer"] = [&](auto elem) { 
 		return TryParseLayerElement(elem, map, map->namedLayers);
@@ -83,7 +84,7 @@ bool TiledMapParser::LoadFromFile(const char* filename, TileMap* map)
 	return true;
 }
 
-bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileSetCollection& tileset)
+bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap *map, TileSetCollection& tileset)
 {
 	// Refer to documentation for tmx file <tileset> element
 	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#tileset
@@ -119,7 +120,7 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileSetC
 
 	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
 	parseFnLookup["image"] = [&](auto elem) {
-		return TryParseImageElement(elem, tileset[name]);
+		return TryParseImageElement(elem, map, tileset[name]);
 	};
 	parseFnLookup["terraintypes"] = [&](auto elem) {
 		// TODO: support tileset terraintypes
@@ -275,7 +276,7 @@ bool TiledMapParser::TryParsePropertiesElement(tinyxml2::XMLElement* elem, Prope
 	return true;
 }
 
-bool TiledMapParser::TryParseImageElement(tinyxml2::XMLElement* elem, TileSet& tileset)
+bool TiledMapParser::TryParseImageElement(tinyxml2::XMLElement* elem, TileMap *map, TileSet& tileset)
 {
 	// Refer to documentation for <image> element
 	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#image
@@ -284,7 +285,7 @@ bool TiledMapParser::TryParseImageElement(tinyxml2::XMLElement* elem, TileSet& t
 	if (strcmp("image", elem->Name()) != 0)
 		return false;
 
-	tileset.imageFileName = elem->Attribute("source");
+	tileset.imageFileName = map->baseFilePath + elem->Attribute("source");
 	tileset.imageWidth = elem->IntAttribute("width");
 	tileset.imageHeight = elem->IntAttribute("height");
 
