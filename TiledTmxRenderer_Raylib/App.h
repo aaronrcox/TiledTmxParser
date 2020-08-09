@@ -21,6 +21,8 @@ public:
 	void Update(float dt);
 	void Draw();
 
+	void SmoothCameraFollow(Vector2 targetPos, float dt);
+
 protected:
 
 	int m_windowWidth = 1440;

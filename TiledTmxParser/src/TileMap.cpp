@@ -78,9 +78,9 @@ void TileMap::DrawLayer(ILayer* iLayer)
 	const int& viewH = m_renderer->settings.viewH;
 
 	int minX = (viewX / (int)tileWidth);
-	int maxX = minX + (viewW / (int)tileWidth) + 1;
+	int maxX = minX + (viewW / (int)tileWidth) + 2.0f;
 	int minY = (viewY / (int)tileHeight);
-	int maxY = minY + (viewH / (int)tileHeight) + 1;
+	int maxY = minY + (viewH / (int)tileHeight) + 2.0f;
 
 	sx = std::max(minX, std::min(sx, maxX));
 	sy = std::max(minY, std::min(sy, maxY));

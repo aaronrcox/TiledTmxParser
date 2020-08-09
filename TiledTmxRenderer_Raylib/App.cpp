@@ -1,5 +1,5 @@
 #include "App.h"
-
+#include "raymath.h"
 #include "TileMap.h"
 #include "TileMapRenderer.h"
 
@@ -44,6 +44,9 @@ void App::Load()
 	m_map->Load("./assets/test.tmx");
 	m_map->SetRenderer(new TileMapRenderer());
 
+	m_playerPos.x = m_map->rows * m_map->tileWidth / 2.0f;
+	m_playerPos.y = m_map->cols * m_map->tileHeight / 2.0f;
+
 	// setup camera
 	m_camera.target = { m_playerPos.x + 20.0f, m_playerPos.y + 20.0f };
 	m_camera.offset = { m_windowWidth / 2.0f, m_windowHeight / 2.0f };
@@ -68,8 +71,8 @@ void App::Update(float dt)
 	if (IsKeyDown(KEY_S)) m_playerPos.y += 100 * dt;
 
 	// update camera
-	m_camera.target = { m_playerPos.x + 20.0f, m_playerPos.y + 20.0f };
-	
+	SmoothCameraFollow(m_playerPos, dt);
+
 	view.x = m_camera.target.x - (m_camera.offset.x * (1.0f / m_camera.zoom));
 	view.y = m_camera.target.y - (m_camera.offset.y * (1.0f / m_camera.zoom));
 	view.width = m_windowWidth * (1.0f/m_camera.zoom);
@@ -90,6 +93,9 @@ void App::Draw()
 		m_map->DrawLayer(layer);
 	}
 
+	DrawCircle(m_playerPos.x, m_playerPos.y, 10, RAYWHITE);
+	DrawCircleLines(m_playerPos.x, m_playerPos.y, 10, GRAY);
+
 	EndMode2D();
 
 	// Draw Game FPS
@@ -97,3 +103,19 @@ void App::Draw()
 	DrawFPS(10, 10);
 }
 
+void App::SmoothCameraFollow(Vector2 targetPos, float dt)
+{
+	static float minSpeed = 30;
+	static float minEffectLength = 10;
+	static float fractionSpeed = 0.8f;
+
+	m_camera.offset = { m_windowWidth / 2.0f, m_windowHeight / 2.0f };
+	Vector2 diff = Vector2Subtract(targetPos, m_camera.target);
+	float length = Vector2Length(diff);
+
+	if (length > minEffectLength)
+	{
+		float speed = fmaxf(fractionSpeed * length, minSpeed);
+		m_camera.target = Vector2Add(m_camera.target, Vector2Scale(diff, speed * dt / length));
+	}
+}
