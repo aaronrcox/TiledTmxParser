@@ -21,8 +21,7 @@ public:
 	void Update(float dt);
 	void Draw();
 
-	void DrawTile(const std::string& texture, int srcX, int srcY, int srcW, int srcH, int dstX, int dstY, int dstW, int dstH, unsigned int color);
-
+	
 protected:
 
 	int m_windowWidth = 800;

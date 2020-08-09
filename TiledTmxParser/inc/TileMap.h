@@ -12,6 +12,7 @@
 class TileMap
 {
 public:
+
 	enum class Orientation {
 		ORTHOGONAL,
 		UNSUPPORTED,
@@ -26,22 +27,26 @@ public:
 		UNKNOWN
 	};
 
+	typedef std::function<void(
+		const std::string textureFilename,
+		int srcX, int srcY, int srcW, int srcH,
+		int dstX, int dstY, int dstW, int dstH,
+		unsigned int color
+		)> DrawTileCb;
+
 public:
 
 	TileMap();
 	~TileMap();
 
-
 	void Load(const char* filename);
 	void LoadTextures(std::function<void(std::string)> loadTextureCallback);
 
-	void Unload();
+	void DrawLayer(ILayer *layer, DrawTileCb draw);
 
 	TileSet *GetTileSetFromGID(unsigned int gTilesetId);
 
-	//unsigned int LayerCount();
-	//Layer* GetLayerById(unsigned int id);
-	//Layer* GetLayerByName(const std::string& name);
+public:
 
 	std::string version;
 	Orientation orientation;

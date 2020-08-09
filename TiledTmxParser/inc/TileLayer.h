@@ -13,7 +13,9 @@ class ILayer
 public:
 
 	enum class LayerType {
-		LAYER, IMAGE_LAYER, OBJECT_GROUP
+		LAYER, 
+		IMAGE_LAYER, // currently un-supported
+		OBJECT_GROUP // currently un-supported
 	};
 
 	LayerType type;
@@ -24,7 +26,7 @@ public:
 	virtual ~ILayer() { }
 };
 
-class Layer : public ILayer
+class TileLayer : public ILayer
 {
 public:
 
@@ -36,10 +38,11 @@ public:
 		bool flipped_diagonally;
 	};
 
+
 public:
 
-	Layer() : ILayer(ILayer::LayerType::LAYER) { }
-	virtual ~Layer() { }
+	TileLayer() : ILayer(ILayer::LayerType::LAYER) { }
+	virtual ~TileLayer() { }
 
 	TileState GetTileData(unsigned int x, unsigned int y);
 

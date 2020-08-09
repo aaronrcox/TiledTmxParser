@@ -289,7 +289,7 @@ bool TiledMapParser::TryParseImageElement(tinyxml2::XMLElement* elem, TileSet& t
 }
 
 
-bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, Layer& layer, LayerData& data)
+bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, LayerData& data)
 {
 	// Refer to documentation for <image> element
 	// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data

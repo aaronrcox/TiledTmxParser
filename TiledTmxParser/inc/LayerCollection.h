@@ -3,6 +3,6 @@
 #include <string>
 #include <map>
 
-#include "Layer.h"
+#include "TileLayer.h"
 
-typedef std::map<std::string, Layer> LayerCollection;
+typedef std::map<std::string, TileLayer> LayerCollection;

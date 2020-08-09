@@ -23,7 +23,7 @@ protected:
 	bool TryParseGroupElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParseEditorSettingsElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParsePropertiesElement(tinyxml2::XMLElement* elem, PropertyCollection& properties);
-	bool TryParseDataElement(tinyxml2::XMLElement* elem, Layer& layer, LayerData& data);
+	bool TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& layer, LayerData& data);
 
 	bool TryParseImageElement(tinyxml2::XMLElement* elem, TileSet& tileset);
 

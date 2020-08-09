@@ -154,7 +154,7 @@
     <ClInclude Include="inc\LayerCollection.h" />
     <ClInclude Include="inc\Property.h" />
     <ClInclude Include="inc\PropertyCollection.h" />
-    <ClInclude Include="inc\Layer.h" />
+    <ClInclude Include="inc\TileLayer.h" />
     <ClInclude Include="inc\TileSet.h" />
     <ClInclude Include="inc\TileSetCollection.h" />
     <ClInclude Include="libs\miniz\miniz.h" />

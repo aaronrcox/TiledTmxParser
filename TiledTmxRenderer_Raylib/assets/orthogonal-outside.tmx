@@ -204,7 +204,7 @@
  </layer>
  <layer id="2" name="Fringe" width="45" height="31">
   <data encoding="base64" compression="zlib">
-   eJzVl1dOxDAURV8k2gr4oq2AHVE2QflkA2wBQhlgBfS2AkSHFdDbCoATiWiiKB7bwbE9VzpSMvJY1365L46IyARMSndpBmZDm+ignkSkN2nfD4azYqwh/A4nbe/jBv/Jx6Zcr8AqrDXqslq5d5uxu1zvwT4cNOjNlU7hHC7gEq6CurHTM7zAK4xp6nTvwY+plmD57/pLMaac9dDahp3C/UCFN5u8xKRUwvaZOnLRZ1Lxu24XfSZEfy32mTpyse4HeIQnOKs5h07lHlpc99Y/5v2GH3Hnew7mHc3lW6k0n7lFx/PFeKbJ3j+qd2cmn2ca3dnDZnwxc7GdAUzUbWcA29o1rXVowQZsBvZiqkM4gmM4CezFVNdwA7dwF9hLLl3t3+AdPuAT+nh2+z09v/TaharfbWs/gt/RwJmzqX0seSzXvpNizqNqP2PIoypPqv00yeMUTDvwVvW9nUmVJ9P91OXxF8tvciA=
+   eJzVl+dNxTAUhW8k2gT8ok3ARpQlKD9ZgBUgdCagtwEQosME9DYB8EUielEUv9jB8c070iclT4517Jtz4yciMgbj0lmagmltE23UFYl0R637fj0r1hrA72DU8j5q8Uw6NuZ6CZZhpVaXxUq9u4zd4XoX9mC/Rm++dALncAGXcKXqxk3P8AKvMFJSp/sAfmy1AIt/11+GMfmsa2sLtjP3fQXeXPLSJMWi22eqyEefiSXsun30GY3+mu0zVeRj3Q/wCE9wVnGOMuV7aHbdm/+Y9xt+xJ/vGZj1NFdoxVJ/5uY9z9fEM03y/TF9OxOFPNOUnT1cxmczp30GOK3wTKedAVxrV7dWYQ3WYUPZi60O4BCO4FjZi62u4QZu4U7ZS6qy2r/BO3zAJ/Tw7vYGen/ptXNFv7vWfgi/w8qZc6l9U/KYr307NTmPpv1sQh5NeTLtp00eJ2DSg7ei/9uJTHmy3c+yPP4CLwhy7A==
   </data>
  </layer>
  <objectgroup id="3" name="Objects">
