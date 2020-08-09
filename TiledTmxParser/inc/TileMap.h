@@ -40,9 +40,10 @@ public:
 	void SetRenderer(ITileMapRenderer* renderer);
 	ITileMapRenderer* GetRenderer();
 
-	void DrawLayer(ILayer *layer);
+	TileLayer* GetTileLayer(const std::string& name);
+	
 
-	TileSet *GetTileSetFromGID(unsigned int gTilesetId);
+	void DrawLayer(ILayer *layer);
 
 public:
 

@@ -505,7 +505,7 @@ void TiledMapParser::PopulateLayerTileData(TileMap *map, TileLayer* layer)
 
 			if (globalTileId > 0)
 			{
-				tileData.tileset = map->GetTileSetFromGID(globalTileId);
+				tileData.tileset = GetTileSetFromGID(map, globalTileId);
 				tileData.localTileId = tileData.tileset->GlobalToLocalTileId(globalTileId);
 				tileData.properties = &tileData.tileset->properties[tileData.localTileId];
 				tileData.flipped_horizontal = flipped_horizontally || flipped_diagonally;
@@ -520,3 +520,16 @@ void TiledMapParser::PopulateLayerTileData(TileMap *map, TileLayer* layer)
 	}
 }
 
+TileSet* TiledMapParser::GetTileSetFromGID(TileMap *map, unsigned int gTilesetId)
+{
+	for (auto& iter : map->tileSets)
+	{
+		auto& tileset = iter.second;
+		int maxId = tileset.firstGlobalTileId + tileset.tileCount;
+
+		if (gTilesetId >= tileset.firstGlobalTileId && gTilesetId < maxId)
+			return &(iter.second);
+	}
+
+	return nullptr;
+}

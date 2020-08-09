@@ -1,5 +1,7 @@
 
 #include "TileMapRenderer.h"
+#include "TileMap.h"
+#include "TileLayer.h"
 
 
 TileMapRenderer::TileMapRenderer()
@@ -20,6 +22,7 @@ void TileMapRenderer::LoadTexture(std::string filename)
 {
 	m_textureLookup[filename] = ::LoadTexture(filename.c_str());
 }
+
 
 void TileMapRenderer::DrawTile(const std::string & textureFilename,
 	int srcX, int srcY, int srcW, int srcH,

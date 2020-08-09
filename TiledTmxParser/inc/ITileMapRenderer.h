@@ -2,6 +2,19 @@
 
 #include <string>
 
+class ILayer;
+
+class TileMapRenderSettings
+{
+public:
+	int viewX = 0;
+	int viewY = 0;
+	int viewW = 1;
+	int viewH = 1;
+
+	bool drawDebugViewLines = false;
+};
+
 class ITileMapRenderer
 {
 public:
@@ -10,8 +23,8 @@ public:
 	virtual ~ITileMapRenderer() = default;
 
 	void SetView(int viewX, int viewY, int viewW, int viewH) {
-		this->viewX = viewX; this->viewY = viewY;
-		this->viewW = viewW; this->viewH = viewH;
+		settings.viewX = viewX; settings.viewY = viewY;
+		settings.viewW = viewW; settings.viewH = viewH;
 	}
 
 public:
@@ -28,9 +41,6 @@ public:
 
 public:
 
-	int viewX = 0;
-	int viewY = 0;
-	int viewW = 1;
-	int viewH = 1;
+	TileMapRenderSettings settings;
 
 };

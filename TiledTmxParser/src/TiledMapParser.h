@@ -35,6 +35,8 @@ protected:
 
 	std::string TrimString(const std::string& s);
 
+	TileSet* GetTileSetFromGID(TileMap* map, unsigned int gTilesetId);
+
 private:
 };
 

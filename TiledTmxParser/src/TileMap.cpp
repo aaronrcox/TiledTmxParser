@@ -48,19 +48,7 @@ ITileMapRenderer* TileMap::GetRenderer()
 	return m_renderer;
 }
 
-TileSet *TileMap::GetTileSetFromGID(unsigned int gTilesetId)
-{
-	for (auto& iter : tileSets)
-	{
-		auto& tileset = iter.second;
-		int maxId = tileset.firstGlobalTileId + tileset.tileCount;
 
-		if (gTilesetId >= tileset.firstGlobalTileId && gTilesetId < maxId)
-			return &(iter.second);
-	}
-
-	return nullptr;
-}
 
 void TileMap::DrawLayer(ILayer* iLayer)
 {
@@ -84,18 +72,21 @@ void TileMap::DrawLayer(ILayer* iLayer)
 	case TileMap::RenderOrder::LEFT_DOWN:   sx = cols - 1; sy = 0;        xd = -1; yd = 1;  break;
 	}
 
+	const int& viewX = m_renderer->settings.viewX;
+	const int& viewY = m_renderer->settings.viewY;
+	const int& viewW = m_renderer->settings.viewW;
+	const int& viewH = m_renderer->settings.viewH;
 
-	int minX = (m_renderer->viewX / (int)tileWidth);
-	int maxX = minX + (m_renderer->viewW / (int)tileWidth) + 1;
-	int minY = (m_renderer->viewY / (int)tileHeight);
-	int maxY = minY + (m_renderer->viewH / (int)tileHeight) + 1;
+	int minX = (viewX / (int)tileWidth);
+	int maxX = minX + (viewW / (int)tileWidth) + 1;
+	int minY = (viewY / (int)tileHeight);
+	int maxY = minY + (viewH / (int)tileHeight) + 1;
 
 	sx = std::max(minX, std::min(sx, maxX));
 	sy = std::max(minY, std::min(sy, maxY));
 	maxX = std::max(0, std::min(maxX, (int)cols));
 	maxY = std::max(0, std::min(maxY, (int)rows));
 
-	
 
 	if (iLayer->type == ILayer::LayerType::LAYER)
 	{
@@ -122,20 +113,23 @@ void TileMap::DrawLayer(ILayer* iLayer)
 				col.value = layer->tintColor;
 				col.a = layer->opacity * col.a;
 
+				int flipX = tileData.flipped_horizontal ? -1 : 1;
+				int flipY = tileData.flipped_vertical ? -1 : 1;
+
 				// Finally, we have enough information to draw the tile
 				m_renderer->DrawTile(
 
 					tileData.tileset->imageFileName,
 
-					tileData.xIndex * tileData.tileset->tileWidth,
-					tileData.yIndex * tileData.tileset->tileHeight,
+					tileData.xIndex* tileData.tileset->tileWidth,
+					tileData.yIndex* tileData.tileset->tileHeight,
 					tileData.tileset->tileWidth,
 					tileData.tileset->tileHeight,
 
-					x * tileWidth,
-					y * tileHeight,
-					tileWidth,
-					tileHeight,
+					x* tileWidth,
+					y* tileHeight,
+					tileWidth* flipX,
+					tileHeight* flipY,
 
 					col.value
 				);
@@ -144,9 +138,11 @@ void TileMap::DrawLayer(ILayer* iLayer)
 		}
 	}
 
-	m_renderer->DrawRectLines(sx* tileWidth, sy* tileHeight, (maxX-sx)*tileWidth, (maxY-sy)*tileHeight, 2, 0xFF000000);
-	m_renderer->DrawRectLines(m_renderer->viewX, m_renderer->viewY, m_renderer->viewW, m_renderer->viewH, 2, 0x7f0000FF);
-	
+	if (m_renderer->settings.drawDebugViewLines)
+	{
+		m_renderer->DrawRectLines(sx* tileWidth, sy* tileHeight, (maxX - sx)* tileWidth, (maxY - sy)* tileHeight, 2, 0xFF000000);
+		m_renderer->DrawRectLines(viewX, viewY, viewW, viewH, 2, 0x7f0000FF);
+	}
 }
 
 
