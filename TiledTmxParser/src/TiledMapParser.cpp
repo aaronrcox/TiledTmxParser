@@ -9,7 +9,7 @@
 
 using namespace tinyxml2;
 
-static std::vector<std::string> explode(const std::string& delimiter, const std::string& str);
+static std::vector<std::string> explode(const std::string& delimiter, const std::string& str, unsigned int reserve = 0);
 
 TiledMapParser::TiledMapParser()
 {
@@ -437,7 +437,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 	auto compression = elem->Attribute("compression"); // uncompressed(nullptr), gzip, zlib, zstd
 	
 	std::string sData = TrimString(elem->GetText());
-	std::string sBytes = base64_decode(sData);
+	
 	
 	// layer data should always end up an array of unsigned ints
 	// reserve the memory to prevent resizing
@@ -446,12 +446,18 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 
 	if (strcmp("csv", encoding) == 0)
 	{
-		throw std::exception("Parsing CSV format in TSX not yet supported, please update to use Base64 - ZLib export");
+		auto sValues = explode(",", sData, numTiles);
+		for (auto& value : sValues)
+		{
+			data.push_back(std::stoi(value));
+		}
 	}
 	else if (strcmp("base64", encoding) == 0 && compression == nullptr)
 	{
 		// uncompressed - copy sBytes to layerdata
 		throw std::exception("Parsing base64(uncompressed) format in TSX not yet supported, please update to use Base64 - ZLib export");
+
+		std::string sBytes = base64_decode(sData);
 		/*
 		data.assign(
 			(unsigned int*)&sBytes.data()[0],
@@ -462,6 +468,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 	{
 		// decompress the data using zlib uncompress
 		// we can calculte the total bytes we need (rows * cols * sizeof(uint_32)
+		std::string sBytes = base64_decode(sData);
 		auto zlibDecompressed = miniz::uncompress(sBytes, numTiles * sizeof(uint32_t));
 
 		// copy the decompressed bytes to our layer data
@@ -476,6 +483,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 		//  - find a gzip compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
 		throw std::exception("Parsing Base64(GZip) format in TSX not yet supported, please update to use Base64 - ZLib export");
+		std::string sBytes = base64_decode(sData);
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("zstd", compression) == 0)
 	{
@@ -483,6 +491,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 		//  - find a zstd compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
 		throw std::exception("Parsing Base64(zstd) format in TSX not yet supported, please update to use Base64 - ZLib export");
+		std::string sBytes = base64_decode(sData);
 	}
 
 	return true;
@@ -683,10 +692,13 @@ std::vector<IObject::Point> TiledMapParser::PointsFromString(const std::string& 
 // Explose method from internet:
 // http://www.zedwood.com/article/cpp-explode-function
 // ------------------------------------------------------
-static std::vector<std::string> explode(const std::string& delimiter, const std::string& str)
+static std::vector<std::string> explode(const std::string& delimiter, const std::string& str, unsigned int reserve)
 {
 	
 	std::vector<std::string> arr;
+	if (reserve > 0) {
+		arr.reserve(reserve);
+	}
 
 	int strleng = str.length();
 	int delleng = delimiter.length();
