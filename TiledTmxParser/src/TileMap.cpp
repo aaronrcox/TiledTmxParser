@@ -49,6 +49,24 @@ ITileMapRenderer* TileMap::GetRenderer()
 }
 
 
+TileLayer* TileMap::GetTileLayer(const std::string& name)
+{
+	auto iter = namedTileLayers.find(name);
+	if (iter == namedTileLayers.end())
+		return nullptr;
+
+	return &iter->second;
+}
+
+ObjectGroupLayer* TileMap::GetObjectGroup(const std::string& name)
+{
+	auto iter = namedObjectLayers.find(name);
+	if (iter == namedObjectLayers.end())
+		return nullptr;
+
+	return &iter->second;
+}
+
 
 void TileMap::DrawLayer(ILayer* iLayer)
 {
@@ -72,6 +90,8 @@ void TileMap::DrawLayer(ILayer* iLayer)
 	case TileMap::RenderOrder::LEFT_DOWN:   sx = cols - 1; sy = 0;        xd = -1; yd = 1;  break;
 	}
 
+	// calculate clipping area based on the viewport defined in the renderer
+	//------------------
 	const int& viewX = m_renderer->settings.viewX;
 	const int& viewY = m_renderer->settings.viewY;
 	const int& viewW = m_renderer->settings.viewW;
@@ -86,6 +106,8 @@ void TileMap::DrawLayer(ILayer* iLayer)
 	sy = std::max(minY, std::min(sy, maxY));
 	maxX = std::max(0, std::min(maxX, (int)cols));
 	maxY = std::max(0, std::min(maxY, (int)rows));
+	//------------------
+
 
 
 	if (iLayer->type == ILayer::LayerType::LAYER)
@@ -133,11 +155,12 @@ void TileMap::DrawLayer(ILayer* iLayer)
 
 					col.value
 				);
-
 			}
 		}
 	}
 
+
+	// Renders Debugging Info
 	if (m_renderer->settings.drawDebugViewLines)
 	{
 		m_renderer->DrawRectLines(sx* tileWidth, sy* tileHeight, (maxX - sx)* tileWidth, (maxY - sy)* tileHeight, 2, 0xFF000000);

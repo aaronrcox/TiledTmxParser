@@ -17,8 +17,10 @@ public:
 protected:
 
 	bool TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap* map, TileSetCollection& tilesets);
-	bool TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layer);
-	bool TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map);
+	bool TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layers);
+	bool TryParseLayerAttributes(tinyxml2::XMLElement* elem, TileMap* map, const std::string& layerName, ILayer* layer);
+	bool TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map, NamedObjectGroupLayerCollection& layers);
+	bool TryParseObjectElement(tinyxml2::XMLElement* elem, TileMap* map, ObjectGroupLayer& layer);
 	bool TryParseImageLayerElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParseGroupElement(tinyxml2::XMLElement* elem, TileMap* map);
 	bool TryParseEditorSettingsElement(tinyxml2::XMLElement* elem, TileMap* map);
@@ -32,6 +34,7 @@ protected:
 	TileMap::RenderOrder RenderOrderFromString(const char* sRenderOrder);
 	Property::Type PropertyTypeFromString(const char* sPropertyType);
 	unsigned int ColorFromString(const char* sColor);
+	std::vector<IObject::Point> PointsFromString(const std::string& str);
 
 	std::string TrimString(const std::string& s);
 

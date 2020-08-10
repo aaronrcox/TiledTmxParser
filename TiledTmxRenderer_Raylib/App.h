@@ -6,6 +6,7 @@
 
 class TileMap;
 class Player;
+class Path;
 
 class App
 {
@@ -38,6 +39,7 @@ protected:
 	Rectangle view = { 0, 0, 1440, 900 };
 
 	Player* m_player = nullptr;
+	Path* m_playerSpawnPath;
 
 private:
 };

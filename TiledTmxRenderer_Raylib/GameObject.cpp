@@ -2,6 +2,9 @@
 #include "GameObject.h"
 #include "Behaviour.h"
 
+// nasty static variables
+bool GameObject::DebugRenderEnabled = false;
+
 GameObject::GameObject()
 {
 
@@ -39,10 +42,15 @@ void GameObject::Draw()
 	if (m_behaviour != nullptr)
 		m_behaviour->Draw(this);
 
-	Vector2 heading = Vector2Add(m_position, m_velocity);
 
-	DrawCircle(m_position.x, m_position.y, 8, GRAY);
-	DrawLine(m_position.x, m_position.y, heading.x, heading.y, BLACK);
+	if (GameObject::DebugRenderEnabled)
+	{
+		Vector2 heading = Vector2Add(m_position, m_velocity);
+
+		DrawCircle(m_position.x, m_position.y, 8, GRAY);
+		DrawLine(m_position.x, m_position.y, heading.x, heading.y, BLACK);
+	}
+	
 
 }
 

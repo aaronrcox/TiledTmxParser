@@ -57,6 +57,15 @@
     <ClInclude Include="inc\ITileMapRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\ILayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ObjectGroupLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\NamedObjectGroupLayerCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\TinyXml2\TinyXml2.cpp">
@@ -78,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TileLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ObjectGroupLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

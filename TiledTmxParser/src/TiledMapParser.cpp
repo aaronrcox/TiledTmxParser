@@ -9,6 +9,8 @@
 
 using namespace tinyxml2;
 
+static std::vector<std::string> explode(const std::string& delimiter, const std::string& str);
+
 TiledMapParser::TiledMapParser()
 {
 
@@ -43,10 +45,10 @@ bool TiledMapParser::LoadFromFile(const std::string& filename, TileMap* map)
 		return TryParseTileSetElement(elem, map, map->tileSets);
 	};
 	parseFnLookup["layer"] = [&](auto elem) { 
-		return TryParseLayerElement(elem, map, map->namedLayers);
+		return TryParseLayerElement(elem, map, map->namedTileLayers);
 	};
 	parseFnLookup["objectgroup"] = [&](auto elem) { 
-		return TryParseObjectGroupElement(elem, map);
+		return TryParseObjectGroupElement(elem, map, map->namedObjectLayers);
 	};
 	parseFnLookup["imagelayer"] = [&](auto elem) { 
 		return TryParseImageLayerElement(elem, map);
@@ -158,6 +160,21 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 
 	return true;
 }
+
+bool TiledMapParser::TryParseLayerAttributes(tinyxml2::XMLElement* elem, TileMap* map, const std::string& layerName, ILayer* layer)
+{
+	layer->name = layerName;
+	layer->map = map;
+	layer->id = elem->IntAttribute("id");
+	layer->opacity = elem->FloatAttribute("opacity", 1.0f);
+	layer->visible = elem->BoolAttribute("visible", true);
+	layer->tintColor = ColorFromString(elem->Attribute("tintcolor"));
+	layer->offsetX = elem->IntAttribute("offsetx");
+	layer->offsetY = elem->IntAttribute("offsety");
+
+	return true;
+}
+
 bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layers)
 {
 	// Refer to documentation for tmx file <layer> element
@@ -172,16 +189,9 @@ bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* m
 		return false;
 
 	// load layer attributes
-	layers[name].name = name;
-	layers[name].map = map;
-	layers[name].id = elem->IntAttribute("id");
+	TryParseLayerAttributes(elem, map, name, &layers[name]);
 	layers[name].rows = elem->IntAttribute("height");
 	layers[name].cols = elem->IntAttribute("width");
-	layers[name].opacity = elem->FloatAttribute("opacity", 1.0f);
-	layers[name].visible = elem->BoolAttribute("visible", true);
-	layers[name].tintColor = ColorFromString(elem->Attribute("tintcolor"));
-	layers[name].offsetX = elem->IntAttribute("offsetx");
-	layers[name].offsetY = elem->IntAttribute("offsety");
 	
 	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
 	parseFnLookup["data"] = [&](auto elem) {
@@ -213,15 +223,127 @@ bool TiledMapParser::TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* m
 	return true;
 }
 
-bool TiledMapParser::TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map)
+bool TiledMapParser::TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map, NamedObjectGroupLayerCollection& layers)
 {
 	if (strcmp("objectgroup", elem->Name()) != 0)
 		return false;
 
-	// TODO: support reading <objectgroup>
-	// will need to generate approprate structs for it
+	auto name = elem->Attribute("name");
+	if (name == nullptr)
+		return false;
+
+	// load attributes
+	TryParseLayerAttributes(elem, map, name, &layers[name]);
+
+	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
+	parseFnLookup["properties"] = [&](auto elem) {
+		return TryParsePropertiesElement(elem, layers[name].properties);
+	};
+	parseFnLookup["object"] = [&](auto elem) {
+		return TryParseObjectElement(elem, map, layers[name]);
+	};
+
+	auto childElem = elem->FirstChildElement();
+	while (childElem != nullptr)
+	{
+		if (parseFnLookup[childElem->Name()])
+		{
+			// do we have a parsing function setup in the lookup table above, call it...
+			parseFnLookup[childElem->Name()](childElem);
+		}
+		else
+		{
+			// no function was setup for the child element...
+			std::cout << "Skipping unknown layer element: " << childElem->Name() << std::endl;
+		}
+		childElem = childElem->NextSiblingElement();
+	}
+
+	// Add the layer to the renderable list of layers
+	map->layers.push_back(&layers[name]);
+
 
 	return true;	
+}
+
+bool TiledMapParser::TryParseObjectElement(tinyxml2::XMLElement* elem, TileMap* map, ObjectGroupLayer& layer)
+{
+	if (strcmp("object", elem->Name()) != 0)
+		return false;
+
+	// TODO: Investigate
+	// for reason unknown elem->IntAttribute seems to be failing for the below properties using std::atoi instead
+	auto x = elem->Attribute("x");
+	auto y = elem->Attribute("y");
+	auto w = elem->Attribute("width");
+	auto h = elem->Attribute("height");
+	auto r = elem->Attribute("rotation");
+	auto t = elem->Attribute("type");
+
+	
+	layer.objects.push_back(IObject());
+	IObject& obj = layer.objects.back();
+
+	obj.id = elem->IntAttribute("id");
+	obj.name = elem->Attribute("name");
+	obj.type = t == nullptr ? "" : t;
+
+	obj.x = x == nullptr ? 0 : std::stoi(x);
+	obj.y = y == nullptr ? 0 : std::stoi(y);
+	obj.width = w == nullptr ? 0 : std::stoi(w);
+	obj.height = h == nullptr ? 0 : std::stoi(h);
+	obj.rotation = r == nullptr ? 0.0f : std::stod(r);
+	obj.visible = elem->BoolAttribute("visible");
+
+	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
+	parseFnLookup["properties"] = [&](auto elem) {
+		return TryParsePropertiesElement(elem, obj.properties);
+	};
+
+	parseFnLookup["point"] = [&](auto elem) {
+		obj.shapeType = IObject::Type::POINT;
+		return true;
+	};
+
+	parseFnLookup["ellipse"] = [&](auto elem) {
+		obj.shapeType = IObject::Type::ELLIPSE;
+		return true;
+	};
+
+	parseFnLookup["polyline"] = [&](auto elem) {
+		obj.shapeType = IObject::Type::POLYLINE;
+		auto points = elem->Attribute("points");
+		if (points != nullptr)
+			obj.shapePoints = PointsFromString(points);
+		return true;
+	};
+
+	parseFnLookup["ploygon"] = [&](auto elem) {
+		obj.shapeType = IObject::Type::POLYGON;
+		auto points = elem->Attribute("points");
+		if (points != nullptr)
+			obj.shapePoints = PointsFromString(points);
+		return true;
+	};
+
+	auto childElem = elem->FirstChildElement();
+	while (childElem != nullptr)
+	{
+		if (parseFnLookup[childElem->Name()])
+		{
+			// do we have a parsing function setup in the lookup table above, call it...
+			parseFnLookup[childElem->Name()](childElem);
+		}
+		else
+		{
+			// no function was setup for the child element...
+			std::cout << "Skipping unknown layer element: " << childElem->Name() << std::endl;
+		}
+		childElem = childElem->NextSiblingElement();
+	}
+
+
+	return true;
 }
 
 bool TiledMapParser::TryParseImageLayerElement(tinyxml2::XMLElement* elem, TileMap* map)
@@ -532,4 +654,63 @@ TileSet* TiledMapParser::GetTileSetFromGID(TileMap *map, unsigned int gTilesetId
 	}
 
 	return nullptr;
+}
+
+std::vector<IObject::Point> TiledMapParser::PointsFromString(const std::string& str)
+{
+	std::vector<IObject::Point> points;
+
+	// explode string by space to get comma seperated x,y numbers
+	auto xy_list = explode(" ", str);
+	
+	for (auto& xys : xy_list)
+	{
+		// explode by , to get individual x and y numbers
+		auto xy = explode(",", xys);
+
+		// add to points
+		points.push_back({
+			std::stoi(xy[0]),
+			std::stoi(xy[1])
+		});
+	}
+
+	return points;
+}
+
+
+// ------------------------------------------------------
+// Explose method from internet:
+// http://www.zedwood.com/article/cpp-explode-function
+// ------------------------------------------------------
+static std::vector<std::string> explode(const std::string& delimiter, const std::string& str)
+{
+	
+	std::vector<std::string> arr;
+
+	int strleng = str.length();
+	int delleng = delimiter.length();
+	if (delleng == 0)
+		return arr;//no change
+
+	int i = 0;
+	int k = 0;
+	while (i < strleng)
+	{
+		int j = 0;
+		while (i + j < strleng && j < delleng && str[i + j] == delimiter[j])
+			j++;
+		if (j == delleng)//found delimiter
+		{
+			arr.push_back(str.substr(k, i - k));
+			i += delleng;
+			k = i;
+		}
+		else
+		{
+			i++;
+		}
+	}
+	arr.push_back(str.substr(k, i - k));
+	return arr;
 }

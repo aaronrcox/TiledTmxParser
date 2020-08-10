@@ -151,8 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="inc\ILayer.h" />
     <ClInclude Include="inc\ITileMapRenderer.h" />
+    <ClInclude Include="inc\NamedObjectGroupLayerCollection.h" />
     <ClInclude Include="inc\NamedTileLayerCollection.h" />
+    <ClInclude Include="inc\ObjectGroupLayer.h" />
     <ClInclude Include="inc\Property.h" />
     <ClInclude Include="inc\PropertyCollection.h" />
     <ClInclude Include="inc\TileLayer.h" />
@@ -170,6 +173,7 @@
     <ClCompile Include="libs\Encoding\base64.cpp" />
     <ClCompile Include="libs\miniz\miniz.cpp" />
     <ClCompile Include="libs\TinyXml2\TinyXml2.cpp" />
+    <ClCompile Include="src\ObjectGroupLayer.cpp" />
     <ClCompile Include="src\TileLayer.cpp" />
     <ClCompile Include="src\TiledMapParser.cpp" />
     <ClCompile Include="src\TileMap.cpp" />

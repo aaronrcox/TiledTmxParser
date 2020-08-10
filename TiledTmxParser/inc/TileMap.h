@@ -7,8 +7,10 @@
 #include "PropertyCollection.h"
 #include "TileSetCollection.h"
 #include "NamedTileLayerCollection.h"
+#include "NamedObjectGroupLayerCollection.h"
 
 class ITileMapRenderer;
+class ObjectGrpupLayer;
 
 class TileMap
 {
@@ -41,6 +43,7 @@ public:
 	ITileMapRenderer* GetRenderer();
 
 	TileLayer* GetTileLayer(const std::string& name);
+	ObjectGroupLayer* GetObjectGroup(const std::string& name);
 	
 
 	void DrawLayer(ILayer *layer);
@@ -57,10 +60,13 @@ public:
 	unsigned int tileWidth;
 	unsigned int tileHeight;
 
-	TileSetCollection tileSets;
-	NamedTileLayerCollection namedLayers;
 	PropertyCollection properties;
 
+	TileSetCollection tileSets;
+
+	NamedTileLayerCollection namedTileLayers;
+	NamedObjectGroupLayerCollection namedObjectLayers;
+	
 	std::vector<ILayer*> layers;
 
 private:

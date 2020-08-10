@@ -43,5 +43,11 @@ protected:
 	Behaviour* m_behaviour = nullptr;
 
 private:
+
+public:
+
+	// Nasty static variable
+	static bool DebugRenderEnabled;
+
 };
 

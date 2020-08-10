@@ -5,6 +5,7 @@
 #include "TileMapRenderer.h"
 
 #include "Player.h"
+#include "Path.h"
 
 App::App()
 {
@@ -46,11 +47,29 @@ void App::Load()
 	m_map->Load("./assets/test.tmx");
 	m_map->SetRenderer(new TileMapRenderer());
 
+	auto levelInfo = m_map->GetObjectGroup("LevelInfo");
+	auto ps = levelInfo->GetObjectByName("PlayerSpawn");
+	auto playerSpawnPath = levelInfo->GetObjectByName("PlayerSpawnPath");
+
+	// load the path from tiled into the Path object
+	m_playerSpawnPath = new Path();
+	for (auto& p : playerSpawnPath->shapePoints)
+	{
+		m_playerSpawnPath->Add({ 
+			levelInfo->offsetX + (float)playerSpawnPath->x + p.x, 
+			levelInfo->offsetY + (float)playerSpawnPath->y + p.y
+		});
+	}
+
+	// create the player
 	m_player = new Player();
 	m_player->SetPosition({
-		m_map->rows * m_map->tileWidth / 2.0f,
-		m_map->cols * m_map->tileHeight / 2.0f
+		ps != nullptr ? ps->x + levelInfo->offsetX : m_map->rows * m_map->tileWidth / 2.0f,
+		ps != nullptr ? ps->y + levelInfo->offsetY : m_map->cols * m_map->tileHeight / 2.0f
 	});
+
+	m_player->SetPath(m_playerSpawnPath);
+	m_player->SetState(Player::State::FollowPath);
 
 	// setup camera
 	m_camera.target = { m_player->GetPosition().x + 20.0f, m_player->GetPosition().y + 20.0f };
@@ -61,6 +80,9 @@ void App::Load()
 }
 void App::Unload()
 {
+	delete m_playerSpawnPath;
+	delete m_player;
+
 	m_map->SetRenderer(nullptr);
 	delete m_map;
 }
@@ -91,6 +113,7 @@ void App::Draw()
 	{
 		m_map->DrawLayer(m_map->layers[i]);
 
+		// draw player on layer 1 (underneith walls / trees)
 		if (i == 1)
 		{
 			DrawPlayer();
@@ -109,6 +132,7 @@ void App::Draw()
 	{
 		auto& rendererSettings = m_map->GetRenderer()->settings;
 		rendererSettings.drawDebugViewLines = !rendererSettings.drawDebugViewLines;
+		GameObject::DebugRenderEnabled = !GameObject::DebugRenderEnabled;
 	}
 }
 

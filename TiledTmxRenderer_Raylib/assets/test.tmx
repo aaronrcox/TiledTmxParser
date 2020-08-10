@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="6">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="8">
  <tileset firstgid="1" name="tilesheet_complete" tilewidth="32" tileheight="32" tilecount="2160" columns="54">
   <image source="topdown-shooter/Tilesheet/tilesheet_complete.png" width="1728" height="1280"/>
   <tile id="0">
@@ -28,8 +28,11 @@
    eJzt19kJAjEQBuCYF6vw6MmjP48GPHrxaMCjCiMIrsjKRgyifB8MC2Eeln8eJgkBAAAAAAAAAAAAAAAAAAAAAAAAAIB3LFohLBvW6lbr1rf/+n8dUrbHVKN4r2Gq04vzs3kUc6jJd5CyH8fn8040j5Lqcv9UP3km7RCm7eb9s9Q7z+gnzyZlu83Id5d69+ZRzCLzvpTbT566fV7nus/79kcx13y7sfkbpGceRQ3i4xuj+taofqvlfgUAAAAAAAAAAAAAAAAAAL/lAsFVLiY=
   </data>
  </layer>
- <objectgroup id="4" name="LevelInfo">
-  <object id="1" name="PlayerSpawn" x="1436" y="1836">
+ <objectgroup id="4" name="LevelInfo" offsetx="1226" offsety="1194">
+  <object id="7" name="PlayerSpawnPath" x="1466" y="1963">
+   <polyline points="0,0 -3,-214 187,-422 196,-862 -95,-1044 -461,-1219 -732,-1310 -950,-1338 -1213,-1339"/>
+  </object>
+  <object id="1" name="PlayerSpawn" type="hello" x="1463" y="1987">
    <point/>
   </object>
  </objectgroup>
