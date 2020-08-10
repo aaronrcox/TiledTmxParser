@@ -51,6 +51,7 @@ void App::Load()
 	auto ps = levelInfo->GetObjectByName("PlayerSpawn");
 	auto playerSpawnPath = levelInfo->GetObjectByName("PlayerSpawnPath");
 
+
 	// load the path from tiled into the Path object
 	m_playerSpawnPath = new Path();
 	for (auto& p : playerSpawnPath->shapePoints)
