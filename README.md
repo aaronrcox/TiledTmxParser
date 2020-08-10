@@ -34,7 +34,7 @@ The only include file nescesary is `TileMap.h`
 **To load a tilemap:**
 ```
 TileMap map;
-map.Load("./assets/mytilemap.tsx");
+map.Load("./assets/mytilemap.tmx");
 ```
 
 We can get `TileLayer`s and `ObjectLayers` by their assigned name.
