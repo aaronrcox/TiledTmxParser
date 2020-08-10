@@ -32,7 +32,7 @@
   <object id="7" name="PlayerSpawnPath" x="1466" y="1963">
    <polyline points="0,0 -3,-214 187,-422 196,-862 -95,-1044 -461,-1219 -732,-1310 -950,-1338 -1213,-1339"/>
   </object>
-  <object id="1" name="PlayerSpawn" type="hello" x="1463" y="1987">
+  <object id="1" name="PlayerSpawn" x="1463" y="1987">
    <point/>
   </object>
  </objectgroup>

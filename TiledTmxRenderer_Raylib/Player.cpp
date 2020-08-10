@@ -5,7 +5,6 @@
 
 Player::Player() : GameObject()
 {
-
 	m_keyboardController = new PlayerKeyboardController();
 	m_followPath = new FollowPathBehaviour();
 

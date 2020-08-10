@@ -107,7 +107,7 @@ void App::Draw()
 	// Setting view port enables renderer
 	// to only draw tiles that are visible.
 	m_map->GetRenderer()->SetView(view.x, view.y, view.width, view.height);
-
+	
 	// loop through each layer - invoke draw method
 	for (int i = 0; i < m_map->layers.size(); i++)
 	{
