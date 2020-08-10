@@ -85,5 +85,7 @@ This project includes the following open source tools / project:
 
 - **Basen:** A Base64 encoding / decoding library <br> [https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base-64-with-cpp/](https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base-64-with-cpp/) 
 
+ - **Raylib:** A C++ Game Programming framework, used for this demo. <br> [https://www.raylib.com](https://www.raylib.com)
+
  - **Kenny Topdown-shooter:** Tileset collection used in the demo project <br> [https://www.kenney.nl/assets/topdown-shooter](https://www.kenney.nl/assets/topdown-shooter)
 
