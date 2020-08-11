@@ -14,6 +14,9 @@ FollowPathBehaviour::~FollowPathBehaviour()
 
 void FollowPathBehaviour::Update(GameObject* obj, float deltaTime)
 {
+	if (m_path->Count() == 0)
+		return;
+
 	Vector2 p1 = (*m_path)[m_currentPathIndex];
 	float dist = Vector2Distance(obj->GetPosition(), p1);
 

@@ -76,6 +76,4 @@ public:
 	ObjectPtrCollection GetObjectsByType(const std::string& type);
 
 	ObjectCollection objects;
-
 };
-

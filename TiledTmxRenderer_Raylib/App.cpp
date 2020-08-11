@@ -48,19 +48,23 @@ void App::Load()
 	m_map->SetRenderer(new TileMapRenderer());
 
 	auto levelInfo = m_map->GetObjectGroup("LevelInfo");
-	auto ps = levelInfo->GetObjectByName("PlayerSpawn");
-	auto playerSpawnPath = levelInfo->GetObjectByName("PlayerSpawnPath");
+	auto ps = levelInfo == nullptr ? nullptr : levelInfo->GetObjectByName("PlayerSpawn");
+	auto playerSpawnPath = levelInfo == nullptr ? nullptr : levelInfo->GetObjectByName("PlayerSpawnPath");
 
 
 	// load the path from tiled into the Path object
 	m_playerSpawnPath = new Path();
-	for (auto& p : playerSpawnPath->shapePoints)
+	if (playerSpawnPath != nullptr)
 	{
-		m_playerSpawnPath->Add({ 
-			levelInfo->offsetX + (float)playerSpawnPath->x + p.x, 
-			levelInfo->offsetY + (float)playerSpawnPath->y + p.y
-		});
+		for (auto& p : playerSpawnPath->shapePoints)
+		{
+			m_playerSpawnPath->Add({
+				levelInfo->offsetX + (float)playerSpawnPath->x + p.x,
+				levelInfo->offsetY + (float)playerSpawnPath->y + p.y
+				});
+		}
 	}
+	
 
 	// create the player
 	m_player = new Player();

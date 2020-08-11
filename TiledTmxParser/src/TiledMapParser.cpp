@@ -24,7 +24,11 @@ TiledMapParser::~TiledMapParser()
 bool TiledMapParser::LoadFromFile(const std::string& filename, TileMap* map)
 {
 	XMLDocument doc;
-	doc.LoadFile(filename.c_str());
+	auto result = doc.LoadFile(filename.c_str());
+
+	// bail out if we have not been able to load the file.
+	if (result != XMLError::XML_SUCCESS)
+		return false;
 
 	auto mapElem = doc.RootElement();
 
