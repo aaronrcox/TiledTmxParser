@@ -8,6 +8,7 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="2161" source="towerDefense_tilesheet.tsx"/>
  <layer id="1" name="Ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
    eJztm91Nw0AQBm0pdgehKWgiacquKimBVghKTtkca4kHzPfZNw+niYKEwu1Mlh9x6bru+jiX6pTnh/556o8fx657G+FfMc7i0N9PNpf4/DWc99vn+BjhX/FSzWLon4+XZhN7Ufu0N5Y7j/dc5hRnEt+7HDzaKy/d653HXrIdovZn76zfk67Jjvieg9qbVljmUfcQm3DwphUOyTziHlH70hqzeTh40iqz76McPGmVZR4DfVgw7gz60PPQv/5uij60zObh4EmrpA8v1rucPjz6iHvdwZNWWebB3zM8eBxfd4jaj9ap9gH+7MPBC0gfjlT7sDb7jf08pfYBttXH1qj2AdKHM9U+QPpwptoHSB/OVPsA6cOZah8gfThT7QOkD2eqfYD04Uy1D5A+nKn2AdKHM9U+QPpwptoHSB/OVPuwNg8b+z96tQ+wrT62RrUPkD6cqfZhiafbHj73dy6dc3LUr3uvfZT7nh53P4XH8f7n6qhf9977mBZmsdSL+nW30MccZlCamJJDH//Tx5y0kb130ce6fdQ75NTnu4T9sT6n6v7jHGIzv90fn4PH17X1PrIdke169sf6+yPec3x/ysj3V+uy9n6uZlOTPmBLfbRKtQ+QPpyp9gHShzPVPkD6cKbaB0gfzlT7AOnDmWofIH04U+0DpA9nqn2A9OFMtQ+QPpyp9gHShzPVPkD6cKbaB0gfzlT7AOnDmWofIH04U+0DpA9nqn2A9OFMtQ+QPpyp9gHShzO/AMvKoUk=
@@ -15,7 +16,7 @@
  </layer>
  <layer id="6" name="Ground2" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt3dtJxEAAQNGYLcRHVZZkP36sldjDqmsNJsjCIPslwlzwHBjyGxhuJo+BLAu/dVqX5W0b79v4WGefDbeHZbnbxv02Hg6zz4a9j8t86GO+vY/L9Uof8+mjRR8t+mjRR4s+WvTRoo8WfbSMfbzoY7qxj/1oTuY7r9996KTjvOqkRic9OunRSc+1Tl5vZp/V/3atkyfPjFNdOvFOpeO82vNQ4p1jiz1BLfpoGfswH/ONe0pdr+bTR8vJ/W6KPlr00aKPFn206KNFHy3jniB9zKePFutHiz5a9NGijxZ9tOijRR8tvg+26KPF+tGijxZ9tOijRR8tvn+06KPF+tGijxZ9tOijRR8t3u+26KPF+tGijxZ9tOijRR8t+mjx/NGijxbrR4s+WvTRoo8WfbTYX9KijxZ9tOijRR8t+mjRR4s+WvTRoo8WfbQc9ZFxHP5ZtB8fzcc0Yxf78dO1apqfXZiLeXTRoYuOZ12knHSR4r9dLWMfnsPn00eLPlr00aKPlr/q4wtmWcY8
+   eJzt3UtOwkAcgPFaVvQSPoJ6Hx+JR/I+LvAIPvbeARWXoDtngg0T0oSEGP7fhO+XTEpZNZ18HQpNaBrtatY2zXsaH2l8ttFHo+NR05ykcZrG2Sj6aJT76OfDPuLlPvrrlX3Esw8W+2CxDxb7YLEPFvtgsQ8W+2Ap+3i0j3BlH3nrnMSbt6s+7IRj3toJjZ3w2AmPnfAMdfJ2FH1Uh22ok3vvGUP1nfidCse89ZkHEr9zZPGZIBb7YCn7cD7ilc+Uer2KZx8sMz/votgHi32w2AeLfbDYB4t9sJTPBNlHPPtgcf1gsQ8W+2CxDxb7YLEPFvtg8fdBFvtgcf1gsQ8W+2CxDxb7YPH3Dxb7YHH9YLEPFvtgsQ8W+2Dx+10W+2Bx/WCxDxb7YLEPFvtgsQ+Wmu4/nsZN85zGy5bt6zj6SHdXUx+LdJ6XaXz/bZcD+/n1T8XzUdP6MenW5/y8W41yv3992UUf6e5q7SOf/4uB+cnv2cd+bPaxOR953z72Z1GsE+V8lPv2sT+Tbn1d6s//+cB7tfdRy/MlV+k836RxvWV7W/F81NTHIaipj0NgHyz2wWIfLPbBYh8s9sFiHyz2wTK1D4xp8Z9FeXvnfIQpu8jbL69VYTa7cC7i2AWHXXA82AXKzC5Q/N8ulrIP78Pj2QeLfbDYB4t9sPxXH79bJvtG
   </data>
  </layer>
  <layer id="3" name="Trees" width="100" height="100">

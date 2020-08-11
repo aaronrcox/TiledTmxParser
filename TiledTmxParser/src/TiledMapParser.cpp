@@ -102,22 +102,27 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 	if (strcmp("tileset", elem->Name()) != 0)
 		return false;
 
-	// ensure the tileset has the "name" attribute
-	auto name = elem->Attribute("name");
-	if (name == nullptr)
-		return false;
+	int firstGlobalTileId = elem->IntAttribute("firstgid");
+
+	tinyxml2::XMLDocument doc;
 
 	// if the source element is set, then the data is stored in an external xml file.
 	auto source = elem->Attribute("source");
 	if (source != nullptr)
 	{
-		// TODO: load the tileset xml doc from file
-		return false;
+		std::string tsxFile = map->baseFilePath + source;
+		doc.LoadFile(tsxFile.c_str());
+		elem = doc.FirstChildElement();
 	}
+
+	// ensure the tileset has the "name" attribute
+	auto name = elem->Attribute("name");
+	if (name == nullptr)
+		return false;
 
 	// Read <tileset> attributes
 	tileset[name].name = name;
-	tileset[name].firstGlobalTileId = elem->IntAttribute("firstgid");
+	tileset[name].firstGlobalTileId = firstGlobalTileId;
 	tileset[name].tileWidth = elem->IntAttribute("tilewidth");
 	tileset[name].tileHeight = elem->IntAttribute("tileheight");
 	tileset[name].spacing = elem->IntAttribute("spacing");
