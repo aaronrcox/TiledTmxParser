@@ -450,7 +450,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 	
 	// layer data should always end up an array of unsigned ints
 	// reserve the memory to prevent resizing
-	unsigned int numTiles = layer.rows * layer.cols + 1;
+	unsigned int numTiles = layer.rows * layer.cols;
 	data.reserve(numTiles);
 
 	if (strcmp("csv", encoding) == 0)
@@ -464,14 +464,16 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 	else if (strcmp("base64", encoding) == 0 && compression == nullptr)
 	{
 		// uncompressed - copy sBytes to layerdata
-		throw std::exception("Parsing base64(uncompressed) format in TSX not yet supported, please update to use Base64 - ZLib export");
+		// throw std::exception("Parsing base64(uncompressed) format in TSX not yet supported, please update to use Base64 - ZLib export");
 
 		std::string sBytes = base64_decode(sData);
-		/*
+
+		uint32_t value = *(uint32_t*)&sBytes.data()[0];
+		
 		data.assign(
-			(unsigned int*)&sBytes.data()[0],
-			(unsigned int*)&sBytes.data()[sBytes.size() - 1]);
-		*/
+			(uint32_t*)&sBytes.data()[0],
+			(uint32_t*)&sBytes.data()[sBytes.size()]);
+		
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("zlib", compression) == 0)
 	{
@@ -483,7 +485,7 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 		// copy the decompressed bytes to our layer data
 		data.assign(
 			(unsigned int*)&zlibDecompressed.data()[0],
-			(unsigned int*)&zlibDecompressed.data()[zlibDecompressed.size() - 1]);
+			(unsigned int*)&zlibDecompressed.data()[zlibDecompressed.size()]);
 
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("gzip", compression) == 0)
@@ -491,15 +493,14 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 		// TODO: support gzip
 		//  - find a gzip compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
-		throw std::exception("Parsing Base64(GZip) format in TSX not yet supported, please update to use Base64 - ZLib export");
-		std::string sBytes = base64_decode(sData);
+		throw std::exception("Parsing Base64(GZip) format in TSX not yet supported, please update to use Base64 - ZLib, uncompressed or csv export");
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("zstd", compression) == 0)
 	{
 		// TODO: support zstd
 		//  - find a zstd compression lib, use it to decompress data
 		//  - copy uncompressed bytes to data.
-		throw std::exception("Parsing Base64(zstd) format in TSX not yet supported, please update to use Base64 - ZLib export");
+		throw std::exception("Parsing Base64(zstd) format in TSX not yet supported, please update to use Base64 - ZLib, uncompressed or csv export");
 		std::string sBytes = base64_decode(sData);
 	}
 
