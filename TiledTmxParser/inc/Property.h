@@ -12,13 +12,18 @@ public:
 
 public:
 
-	Property() : 
-		name(""), value(""), type(Type::STRING) { }
+	Property();
+	Property(const std::string& value, Type type);
 
-	Property(const std::string& name, const std::string& value, Type type) : 
-		name(name), value(value), type(type) { }
 
-	std::string name;
+	void Set(const std::string& value);
+	void Set(int value);
+	void Set(float value);
+	void Set(bool value);
+	void SetColor(unsigned int color);
+	void SetFile(const std::string& filename);
+	void SetObject(unsigned int objectId);
+	
 	std::string value;
 	Type type;
 };

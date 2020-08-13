@@ -51,6 +51,7 @@ void App::Load()
 	auto ps = levelInfo == nullptr ? nullptr : levelInfo->GetObjectByName("PlayerSpawn");
 	auto playerSpawnPath = levelInfo == nullptr ? nullptr : levelInfo->GetObjectByName("PlayerSpawnPath");
 
+	auto& props = m_map->tileSets["towerDefense_tilesheet"].properties[0];
 
 	// load the path from tiled into the Path object
 	m_playerSpawnPath = new Path();

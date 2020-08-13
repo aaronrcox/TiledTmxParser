@@ -147,8 +147,8 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 		return false;
 	};
 	parseFnLookup["tile"] = [&](auto elem) {
-		// TODO: support tile & tile properties
-		return false;
+		
+		return TryParseTileElement(elem, map, &tileset[name]);
 	};
 	
 	auto childElem = elem->FirstChildElement();
@@ -169,6 +169,51 @@ bool TiledMapParser::TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap 
 
 	return true;
 }
+
+bool TiledMapParser::TryParseTileElement(tinyxml2::XMLElement* elem, TileMap* map, TileSet* tileset)
+{
+	if (strcmp("tile", elem->Name()) != 0)
+		return false;
+
+	unsigned int localTileId = elem->IntAttribute("id");
+	const char* szTileType = elem->Attribute("type");
+	float probability = elem->FloatAttribute("probability", 0.0f);
+
+	if (probability > 0.0f)
+		tileset->properties[localTileId]["probability"].Set(probability);
+
+	std::map<std::string, std::function<bool(XMLElement* elem)>> parseFnLookup;
+	parseFnLookup["properties"] = [&](auto elem) {
+		return TryParsePropertiesElement(elem, tileset->properties[localTileId]);
+	};
+	parseFnLookup["image"] = [&](auto elem) {
+		// TODO:
+		return false;
+	};
+	parseFnLookup["objectgroup"] = [&](auto elem) {
+		// TODO:
+		return false;
+	};
+
+	auto childElem = elem->FirstChildElement();
+	while (childElem != nullptr)
+	{
+		if (parseFnLookup[childElem->Name()])
+		{
+			// do we have a parsing function setup in the lookup table above, call it...
+			parseFnLookup[childElem->Name()](childElem);
+		}
+		else
+		{
+			// no function was setup for the child element...
+			std::cout << "Skipping unknown tileset element: " << childElem->Name() << std::endl;
+		}
+		childElem = childElem->NextSiblingElement();
+	}
+
+	return true;
+}
+
 
 bool TiledMapParser::TryParseLayerAttributes(tinyxml2::XMLElement* elem, TileMap* map, const std::string& layerName, ILayer* layer)
 {
@@ -289,7 +334,6 @@ bool TiledMapParser::TryParseObjectElement(tinyxml2::XMLElement* elem, TileMap* 
 	auto r = elem->Attribute("rotation");
 	auto t = elem->Attribute("type");
 
-	
 	layer.objects.push_back(IObject());
 	IObject& obj = layer.objects.back();
 
@@ -407,7 +451,7 @@ bool TiledMapParser::TryParsePropertiesElement(tinyxml2::XMLElement* elem, Prope
 
 		if (name != nullptr) 
 		{
-			properties[name] = Property(name, value, type);
+			properties[name] = Property(value, type);
 		}
 
 		// move to next <property> element
@@ -484,8 +528,8 @@ bool TiledMapParser::TryParseDataElement(tinyxml2::XMLElement* elem, TileLayer& 
 
 		// copy the decompressed bytes to our layer data
 		data.assign(
-			(unsigned int*)&zlibDecompressed.data()[0],
-			(unsigned int*)&zlibDecompressed.data()[zlibDecompressed.size()]);
+			(uint32_t*)&zlibDecompressed.data()[0],
+			(uint32_t*)&zlibDecompressed.data()[zlibDecompressed.size()]);
 
 	}
 	else if (strcmp("base64", encoding) == 0 && strcmp("gzip", compression) == 0)

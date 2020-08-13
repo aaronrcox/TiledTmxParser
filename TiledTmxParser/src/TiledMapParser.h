@@ -17,6 +17,7 @@ public:
 protected:
 
 	bool TryParseTileSetElement(tinyxml2::XMLElement* elem, TileMap* map, TileSetCollection& tilesets);
+	bool TryParseTileElement(tinyxml2::XMLElement* elem, TileMap* map, TileSet* tileset);
 	bool TryParseLayerElement(tinyxml2::XMLElement* elem, TileMap* map, NamedTileLayerCollection& layers);
 	bool TryParseLayerAttributes(tinyxml2::XMLElement* elem, TileMap* map, const std::string& layerName, ILayer* layer);
 	bool TryParseObjectGroupElement(tinyxml2::XMLElement* elem, TileMap* map, NamedObjectGroupLayerCollection& layers);
